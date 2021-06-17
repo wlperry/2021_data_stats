@@ -1,0 +1,81 @@
+# install packages ----
+# these shoudl be installed already and are commented out so they wont run
+# unless you remove the '#' 
+
+# The ones to be sure are installed this week are ---
+# install.packages("tidyverse")
+# install.packages("readxl")
+# install.packages("janitor")
+# install.packages("skimr")
+
+
+# load libraries ----
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(skimr)
+
+
+# read in files ---
+# this is how you do a csv fiele - commas separated values
+pc.df <- read_csv("data/Liza_MYCT8F_complete data from Marvin.csv") %>% clean_names()
+
+# this is how you import excel
+pc_excel.df <- read_excel("")
+
+# the dataframe ----
+# How to see varaible names?
+# replace `dataframe` with the name of the dataframe
+# - do you see an issue? Note `Name`
+# what is the easy way to fix this?
+names(dataframe)
+
+# look at the top of the dataframe
+head(pc.df)
+
+# to look at only one column you can use the dataframe$column
+
+
+# How to summarize data
+# summary(dataframe)
+
+
+# use skimr - skim(dataframe)
+
+
+
+# Graphing the data -----
+ggplot(dataframe, aes(x=XXXXXX, y=YYYYY )) 
+
+
+
+
+
+
+# Graphing mean and standard error ----
+ggplot(dataframe, aes(x=XXXXXX, y=YYYYY ))  +
+   stat_summary(fun = mean, na.rm = TRUE,
+             geom = "point",
+             size = 1) +
+  stat_summary(fun.data = mean_se, na.rm = TRUE,
+               geom = "errorbar",
+               width = 0.2) 
+
+
+ggplot(pc.df, aes(x=id_from_main_protocol, y=area_mm2 ))  +
+  stat_summary(fun = mean, na.rm = TRUE,
+               geom = "point",
+               size = 1) +
+  stat_summary(fun.data = mean_se, na.rm = TRUE,
+               geom = "errorbar",
+               width = 0.2) 
+
+
+
+ggplot(pc.df, aes(x=length_mm, y=width_mm )) +
+  geom_point()
+
+ggplot(pc.df, aes(x=length_mm, y=width_mm, color=as.factor(id_from_main_protocol) )) +
+  geom_point(position = position_jitter(width=0.02), alpha=0.5) +
+  geom_smooth(method = "lm") +
+  facet_wrap(~as.factor(id_from_main_protocol))
