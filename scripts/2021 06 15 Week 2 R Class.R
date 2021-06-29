@@ -20,46 +20,47 @@ library(skimr)
 # this is how you do a csv fiele - commas separated values
 pc.df <- read_csv("data/Liza_MYCT8F_complete data from Marvin.csv") %>% clean_names()
 
+names(pc.df)
+
 # this is how you import excel
-pc_excel.df <- read_excel("")
+pc_excel.df <- read_excel("data/Liza_MYCT8F_complete data from Marvin.xls") %>% clean_names()
 
 # the dataframe ----
-# How to see varaible names?
+# How to see variable names?
 # replace `dataframe` with the name of the dataframe
 # - do you see an issue? Note `Name`
 # what is the easy way to fix this?
-names(dataframe)
+names(pc_excel.df)
 
 # look at the top of the dataframe
 head(pc.df)
 
 # to look at only one column you can use the dataframe$column
-
+pc.df$length_mm
 
 # How to summarize data
 # summary(dataframe)
-
+summary(pc.df)
 
 # use skimr - skim(dataframe)
+skim(pc.df)
 
-
+pc.df %>% group_by(id_from_main_protocol) %>% skim()
 
 # Graphing the data -----
-ggplot(dataframe, aes(x=XXXXXX, y=YYYYY )) 
-
-
-
-
+ggplot(pc.df, aes(x=as.factor(id_from_main_protocol), y=length_mm )) +
+  geom_boxplot()
 
 
 # Graphing mean and standard error ----
-ggplot(dataframe, aes(x=XXXXXX, y=YYYYY ))  +
+ggplot(pc.df, aes(x=as.factor(id_from_main_protocol), y=area_mm2, color= as.factor(id_from_main_protocol))) +
    stat_summary(fun = mean, na.rm = TRUE,
              geom = "point",
              size = 1) +
   stat_summary(fun.data = mean_se, na.rm = TRUE,
                geom = "errorbar",
-               width = 0.2) 
+               width = 0.2) +
+theme_bw()
 
 
 ggplot(pc.df, aes(x=id_from_main_protocol, y=area_mm2 ))  +

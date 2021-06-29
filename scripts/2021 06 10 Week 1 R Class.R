@@ -40,9 +40,10 @@ library(emmeans)
 
 
 # Operators ---- 
-# the key is the assingment operator =   <-   - takes what is on right and puts it in left
-# this is difernet than the pipe operatore =   %>%    - which takes stuff on the left 
+# the key is the assignment operator =   <-   - takes what is on right and puts it in left
+# this is different than the pipe operator =   %>%    - which takes stuff on the left 
                                                       # and feeds it to the next command on the rights
+
 
 
 # now to load a file ----
