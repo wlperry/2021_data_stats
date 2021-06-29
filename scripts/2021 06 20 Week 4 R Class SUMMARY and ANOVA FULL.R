@@ -1,25 +1,10 @@
-# load libraries ----
-library(tidyverse)
-library(readxl)
-library(janitor)
-library(skimr)
-library(lubridate)
+# OK - FOR HOMEWORK ----
+# your task for this week is to work through the code that I have below that is from last week.
+# the older stuff ends at line 190 roughly 
+# the idea is that you can try your skills to read in data and fill in the blanks and I have put RRRRRR for areas to fill in 
+# with a question
 
-# # install new packages ----
-# install.packages("car")
-# install.packages("emmeans")
-# install.packages("multcompView")
-# install.packages("Hmisc")
-
-
-# then load libraries
-library(car)
-library(emmeans)
-library(multcompView)
-
-
-
-# So today we are going to try a few differnet approaches
+# So today we are going to try a few different approaches
 # The goal is to
 #   - create file of plant measure standard deviations not in summary file
 #   - join the standard deviations into the summary file
@@ -59,6 +44,28 @@ library(multcompView)
 #        l_w_ratio  = length divided by width 
 #        datetime = the date and time of the measures
 #        seed_type = genotype name of seeds
+
+
+
+# load libraries ----
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(skimr)
+library(lubridate)
+
+# # install new packages ----
+# install.packages("car")
+# install.packages("emmeans")
+# install.packages("multcompView")
+# install.packages("Hmisc")
+
+
+# then load libraries
+library(car)
+library(emmeans)
+library(multcompView)
+
 
 
 
