@@ -1,13 +1,10 @@
 # OK - FOR HOMEWORK ----
-# your task for this week is to work through the code that I have below that is from last week.
-# the older stuff ends at line 190 roughly 
-# the idea is that you can try your skills to read in data and fill in the blanks and I have put RRRRRR for areas to fill in 
-# with a question
+
+
+
 
 # So today we are going to try a few different approaches
 # The goal is to
-#   - create file of plant measure standard deviations not in summary file
-#   - join the standard deviations into the summary file
 #   - plot the data to see both from the original file and the new summary file
 #        - there are two ways to do this and knowing both is key for later
 #   - run an ANOVA on the data by plant
@@ -45,7 +42,11 @@
 #        datetime = the date and time of the measures
 #        seed_type = genotype name of seeds
 
-
+# # install new packages if you have not done so already  ----
+# install.packages("car")
+# install.packages("emmeans")
+# install.packages("multcompView")
+# install.packages("Hmisc")
 
 # load libraries ----
 library(tidyverse)
@@ -54,20 +55,10 @@ library(janitor)
 library(skimr)
 library(lubridate)
 
-# # install new packages ----
-# install.packages("car")
-# install.packages("emmeans")
-# install.packages("multcompView")
-# install.packages("Hmisc")
-
-
 # then load libraries
 library(car)
 library(emmeans)
 library(multcompView)
-
-
-
 
 # read in files ---
 # this is how you read a csv fiele - commas separated values
@@ -100,11 +91,6 @@ summary.df <- summary.df %>%
 summary.df <- summary.df %>% 
   mutate(id = as.numeric(id))
 
-# now lets make each id a factor and seed_type
-summary.df <- summary.df %>% 
-  mutate(id = as.factor(id),
-         seed_type = as.factor(seed_type))
-
 # Lubridate and paste to make a datetime column
 summary.df <- summary.df %>% 
   mutate(datetime = paste(date, time, sep=" "))
@@ -133,7 +119,11 @@ summary.df <- summary.df %>%
     id %in% c(4322, 4323, 4324, 4325, 4326, 4327, 4328, 4329) ~ "mutant 7B",
     TRUE~"other"))
 
-
+# now lets make each id a factor and seed_type
+summary.df <- summary.df %>% 
+  mutate(id = as.factor(id),
+         type = as.factor(type),
+         seed_type = as.factor(seed_type))
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -150,11 +140,6 @@ full.df <- full.df %>%
 full.df <- full.df %>% 
   mutate(id = as.numeric(id))
 
-# make id and seedtype a factor
-full.df <- full.df %>% 
-  mutate(id = as.factor(id),
-         seed_type = as.factor(seed_type))
-
 # remember above you need to make ID Numeric - how do you do it.
 
 # Case_when for plant line
@@ -167,7 +152,16 @@ full.df <- full.df %>%
     id %in% c(4314, 4315, 4316, 4317, 4318, 4319, 4320, 4321) ~ "mutatn 8A",
     id %in% c(4322, 4323, 4324, 4325, 4326, 4327, 4328, 4329) ~ "mutant 7B",
     TRUE~"other"))
-  
+
+
+
+# make id and seedtype a factor
+full.df <- full.df %>% 
+  mutate(id = as.factor(id),
+         type = as.factor(type),
+         seed_type = as.factor(seed_type))
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -175,19 +169,26 @@ full.df <- full.df %>%
 # Make a summary stats dataframe ----
 # here we are only going to do standard deviations 
 std_dev.df <- full.df %>% 
-  group_by(id, type) %>% 
+  group_by(id, seed_type) %>% 
   summarise(
     stddev_length_mm = sd(length_mm, na.rm=TRUE),
-    stddev_width_mm = sd(width_mm, na.rm=TRUE)
-    )
-  
+    stddev_width_mm = sd(width_mm, na.rm=TRUE),
+    stddev_area_mms = sd(area_mm2, na.rm=TRUE)
+  )
+
 
 # Joining files ----
 # Note that the std_dev.df dataframe is 32 observations and so is summary.df
 # the id is the same in both and we want to link them based on this.
 # we can save it to the summary dataframe
 
-summary.df <- full_join(summary.df, std_dev.df, by="id")
+summary.df <- full_join(summary.df, std_dev.df, by=c("id", "seed_type"))
+
+summary.df <- summary.df %>% 
+  select(id, type, seed_type, mean_length, mean_width, mean_area, stddev_length_mm, stddev_width_mm, 
+         stddev_area_mms, everything())
+
+write_csv(summary.df, "data/mutant_seed_parameters.csv")
 
 
 # We can plot the summary data in two ways - how did we do it before 
@@ -249,6 +250,7 @@ leveneTest(mean_length ~ seed_type, data = summary.df)
 # now run the ANOVA-----
 # Anova Type II SS
 Anova(length.model, type="III")
+
 
 # POST F TESTS ------
 # Post F Tests run if there is a significant effect----

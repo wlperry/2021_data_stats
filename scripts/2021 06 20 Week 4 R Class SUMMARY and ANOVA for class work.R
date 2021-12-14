@@ -103,7 +103,7 @@ summary.df <- summary.df %>%
 # now lets make each id a factor and seed_type
 summary.df <- summary.df %>% 
   mutate(id = as.factor(id),
-         seed_type = as.factor(seed_type))
+         type = as.factor(type))
 
 # Lubridate and paste to make a datetime column
 summary.df <- summary.df %>% 
@@ -133,7 +133,7 @@ summary.df <- summary.df %>%
     id %in% c(4322, 4323, 4324, 4325, 4326, 4327, 4328, 4329) ~ "mutant 7B",
     TRUE~"other"))
 
-
+summary.df$seed_type
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -153,7 +153,7 @@ full.df <- full.df %>%
 # make id and seedtype a factor
 full.df <- full.df %>% 
   mutate(id = as.factor(id),
-         seed_type = as.factor(seed_type))
+         type = as.factor(type))
 
 # remember above you need to make ID Numeric - how do you do it.
 
@@ -168,6 +168,9 @@ full.df <- full.df %>%
     id %in% c(4322, 4323, 4324, 4325, 4326, 4327, 4328, 4329) ~ "mutant 7B",
     TRUE~"other"))
   
+
+
+write_csv(summary.df, "output/summary data file.csv")
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -177,8 +180,11 @@ full.df <- full.df %>%
 std_dev.df <- full.df %>% 
   group_by(id, type) %>% 
   summarise(
-    stddev_length_mm = RRRRRR   ,
-    stddev_width_mm = RRRRRRR
+    stddev_length_mm = sd(length_mm, na.rm=TRUE)   ,
+    stddev_width_mm = sd(width_mm, na.rm=TRUE),
+    stddev_area_mm2 = sd(area_mm2, na.rm = TRUE),
+    mean_area = mean(area_mm2, na.rm=TRUE),
+    count_area = length(area_mm2)
     )
   
 
@@ -187,7 +193,7 @@ std_dev.df <- full.df %>%
 # the id is the same in both and we want to link them based on this.
 # we can save it to the summary dataframe
 
-summary.df <- 
+test.df <- full_join(summary.df, std_dev.df, by = c("id", "type") )
 
 
 # We can plot the summary data in two ways - how did we do it before 
@@ -201,20 +207,25 @@ full.df %>%
   stat_summary(fun = mean, na.rm = TRUE,
                geom = "point",
                size = 3) +
-  stat_summary(fun.data = RRRRRRRR, na.rm = TRUE, fun.args = list(mult = 1),
+  stat_summary(fun.data = mean_se, na.rm = TRUE, 
                geom = "errorbar",
                width = 0.2) 
 
 # now how would you do this on the summary dataframe
 summary.df %>% 
-  ggplot(aes(seed_type, mean_length, color=seed_type)) +
+  ggplot(aes(seed_type, mean_length, color=seed_type)) 
+
++
   stat_summary(fun = mean, na.rm = TRUE,
                geom = "point",
                size = 3) +
-  stat_summary(fun.data = RRRRRR, na.rm = TRUE, 
-               
+  stat_summary(fun.data = mean_sdl, na.rm = TRUE, 
                geom = "errorbar",
-               width = 0.2) 
+               width = 0.2, fun.args = list(mult = 1)) +
+  scale_color_manual(name = "Genotype", 
+                     values = c("red", "blue","orange", "green"),
+                     labels = c("11B", "7B", "8A", "WT")) +
+theme_bw ()
 
 
 # ANOVA - TESTING FOR DIFFERNECES IN LENGTH ------
